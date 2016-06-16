@@ -37,7 +37,7 @@ function addInhertiedProperties(model, modelId, models){
   for(var propertyName in parent.properties){
     model.properties[propertyName] = parent.properties[propertyName];
   }
-  
+
   if(parent.required) model.required = model.required.concat(parent.required);
 
   addInhertiedProperties(model, parent.id, models);
@@ -66,15 +66,21 @@ function validateModel(candidate, model, models){
 
   Object.keys(candidate).forEach(function(propertyName){
     var property = model.properties[propertyName];
-    
+
     if(property === undefined) return;
 
-    var error = validate.dataType(candidate[propertyName], property, models);
+    // do not check the type when the null
+    if (candidate[propertyName] === null) {
+      var error = false;
+    } else {
+      var error = validate.dataType(candidate[propertyName], property, models);
+    }
+
     if(error){
       errors.push(new ValidationError(propertyName, property, error));
     }
   });
-  
+
   if(errors.length){
     return new ValidationErrors(candidate, model.id, model, errors);
   }
