@@ -66,14 +66,20 @@ function validateModel(candidate, model, models){
 
   Object.keys(candidate).forEach(function(propertyName){
     var property = model.properties[propertyName];
+    var error;
 
     if(property === undefined) return;
 
     // do not check the type when the null
-    if (candidate[propertyName] === null) {
-      var error = false;
+    if (
+      candidate[propertyName] === null &&
+      !model.required.some(function(item) {
+        return item === propertyName;
+      })
+    ) {
+      error = false;
     } else {
-      var error = validate.dataType(candidate[propertyName], property, models);
+      error = validate.dataType(candidate[propertyName], property, models);
     }
 
     if(error){
